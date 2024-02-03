@@ -19,7 +19,7 @@ def show_top_nbu_rates(request):
 @csrf_exempt
 def show_image(request, imagepth):
     if request.method == "GET":
-        img_path = os.path.join("../assets", imagepth)
+        img_path = os.path.join("./assets", imagepth)
         if os.path.exists(img_path) and os.path.isfile(img_path):
             with open(img_path, 'rb') as fl:
                 img_send = fl.read()
