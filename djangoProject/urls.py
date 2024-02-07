@@ -17,6 +17,7 @@ Including another URLconf
 from django.urls import path
 from views import show_top_nbu_rates, show_image, url_validate, metadata_text, info
 from views import entity_list, entity_detail, create_entity, delete_entity
+from views import get_header_view, get_cookie_view, set_cookie_view, set_header_view
 
 urlpatterns = [
     path("nbu_rates/", show_top_nbu_rates, name="rates"),
@@ -27,5 +28,9 @@ urlpatterns = [
     path('entity/<int:id>/', entity_detail, name='entity_detail'),
     path('entity/create/', create_entity, name='create_entity'),
     path('entity/<int:id>/delete/', delete_entity, name='delete_entity'),
+    path('cookie/set/', set_cookie_view, name='set_cookie'),
+    path('cookie/get/<str:n>', get_cookie_view, name='get_cookie'),
+    path('header/set/', set_header_view, name='set_header'),
+    path('header/get/<str:n>', get_header_view, name='get_header'),
     path("info/", info, name="info")
 ]

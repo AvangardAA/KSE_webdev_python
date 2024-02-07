@@ -9,6 +9,9 @@ import json
 
 from django.shortcuts import render
 
+from helpers.cookie_set_get import set_cookie, get_cookie
+from helpers.headers_set_get import get_header, set_header
+
 def read_entities():
     f = os.path.join(os.path.dirname(__file__), 'data/entities.txt')
     with open(f, 'r') as fl:
@@ -28,6 +31,8 @@ def show_top_nbu_rates(request):
         responseList.append(i)
 
     return HttpResponse(content=json.dumps(responseList), content_type="application/json")
+
+""" ------------ HW 3 BEGIN --------------- """
 
 @csrf_exempt
 def show_image(request, imagepth):
@@ -92,6 +97,7 @@ def url_validate(request):
 @csrf_exempt
 def metadata_text(request):
     """ In order to use this send file and search string in body as form-data """
+    
     if request.method == 'POST':
         parser = MultiPartParser(request.META, request, request.upload_handlers)
         post, flbuf = parser.parse()
@@ -109,22 +115,30 @@ def metadata_text(request):
     else:
         return HttpResponseNotAllowed(permitted_methods=["POST"])
 
+""" ------------ HW 3 END --------------- """
+
+
+""" ------------ HW 6 BEGIN --------------- """
+
 def entity_list(request):
     entities = read_entities()
     return render(request, 'entity_list.html', {'entities': entities})
 
 def entity_detail(request, id):
+    """ localhost:8000/entity/ """
+
     entities = read_entities()
     for entity in entities:
         if entity['id'] == id:
             return render(request, 'entity_detail.html', {'entity': entity})
     
-    return HttpResponseNotFound(content=json.dumps({"error": "entity not found"}), content_type="application/json")
+    return HttpResponseNotFound(content=json.dumps({"msg": "entity not found"}), content_type="application/json")
 
 @csrf_exempt
 def create_entity(request):
-    """ send raw body from postman """
-    """ {"id":1,"name":"dummy2","img_link":"netflix_image.png"} - example """
+    """ localhost:8000/entity/create/ \n""" \
+    """ body : {"id":1,"name":"dummy2","img_link":"netflix_image.png"}"""
+
     if request.method == 'POST':
         try:
             dt = json.loads(request.body)
@@ -135,11 +149,12 @@ def create_entity(request):
         except Exception as e:
             return HttpResponse(content=json.dumps({"msg": "error creating"}), status=500, content_type="application/json")
     else:
-        return HttpResponseNotAllowed(permitted_methods=["POST"])
+        return HttpResponseNotAllowed(permitted_methods=["POST"], content=json.dumps({"msg": "method not allowed"}))
 
 @csrf_exempt
 def delete_entity(request, id):
-    """ /entity/<ID>/delete """
+    """ localhost:8000/entity/<ID>/delete/ """
+
     if request.method == 'DELETE':
         try:
             entities = read_entities()
@@ -149,11 +164,58 @@ def delete_entity(request, id):
         except Exception as e:
             return HttpResponse(content=json.dumps({"msg": "error deleting"}), status=500, content_type="application/json")
     else:
-        return HttpResponseNotAllowed(permitted_methods=["DELETE"])
+        return HttpResponseNotAllowed(permitted_methods=["DELETE"], content=json.dumps({"msg": "method not allowed"}))
+    
+""" ------------ HW 6 END --------------- """
 
+
+""" ------------ HW 7 BEGIN --------------- """
+
+@csrf_exempt
+def set_cookie_view(request):
+    """ localhost:8000/cookie/set/?n=dummy&val=dummy_value&httpOnly=false"""
+
+    if request.method == 'GET':
+        response = HttpResponse(content=json.dumps({'msg': 'set success'}), content_type="application/json")
+        set_cookie(response, request.GET.get('n'), request.GET.get('val'), request.GET.get('httpOnly', False) == 'true')
+        return response
+    
+    return HttpResponseNotAllowed(permitted_methods=["GET"], content=json.dumps({"msg": "method not allowed"}))
+
+@csrf_exempt
+def get_cookie_view(request, n):
+    """ localhost:8000/cookie/get/dummy """
+
+    if request.method == 'GET':
+        return HttpResponse(content=json.dumps({n: get_cookie(request, n)}), content_type="application/json")
+    
+    return HttpResponseNotAllowed(permitted_methods=["GET"], content=json.dumps({"msg": "method not allowed"}))
+
+@csrf_exempt
+def set_header_view(request):
+    """ localhost:8000/header/set/?n=dummy&val=dummy_val """
+    
+    if request.method == 'GET':
+        response = HttpResponse(content=json.dumps({'msg': 'set success'}), content_type="application/json")
+        set_header(response, request.GET.get('n'), request.GET.get('val'))
+        return response
+
+    return HttpResponseNotAllowed(permitted_methods=["GET"], content=json.dumps({"msg": "method not allowed"}))
+
+@csrf_exempt
+def get_header_view(request, n):
+    """ localhost:8000/header/get/dummy \n""" \
+    """ in headers set dummy:<some value> """
+
+    if request.method == 'GET':
+        return HttpResponse(content=json.dumps({n: get_header(request, n)}), content_type="application/json")
+    
+    return HttpResponseNotAllowed(permitted_methods=["GET"], content=json.dumps({"msg": "method not allowed"}))
+
+""" ------------ HW 7 END --------------- """
 
 def info(request):
     return HttpResponse(content=json.dumps(
         {"info": "file upload can be used via /metadata/, use form-data to attach file and search string to find\n \
          url validation can be accesed via /url_validate/ and body parameter 'url'\nand lastly image can be accessed through /image/\n \
-         /entity to list entities\n/entity/<ID> to check detailed entity\n/entity/create to create entity, pass it as raw body json object in post\n/entity/<ID>/delete to delete entity"}), content_type="application/json")
+         /entity/ to list entities\n/entity/<ID>/ to check detailed entity\n/entity/create/ to create entity, pass it as raw body json object in post\n/entity/<ID>/delete/ to delete entity"}), content_type="application/json")
