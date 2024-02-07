@@ -1,0 +1,14 @@
+<h1>Entity list</h1>
+<ul>
+    {% for entity in entities %}
+        <li>
+            <a href="/entity/{{ entity.id }}/">{{ entity.name }}</a>
+            {% if entity.img_link %}
+                <p>Image available</p>
+            {% else %}
+                <p>No image</p>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+

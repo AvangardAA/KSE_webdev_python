@@ -7,6 +7,19 @@ import os
 import requests
 import json
 
+from django.shortcuts import render
+
+def read_entities():
+    f = os.path.join(os.path.dirname(__file__), 'data/entities.txt')
+    with open(f, 'r') as fl:
+        entities = json.load(fl)
+    return entities
+
+def write_entities(entities):
+    f = os.path.join(os.path.dirname(__file__), 'data/entities.txt')
+    with open(f, 'w') as fl:
+        json.dump(entities, fl, indent=0)
+
 def show_top_nbu_rates(request):
     rates = requests.get("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json")
     rateDict = rates.json()
@@ -36,7 +49,7 @@ def show_image(request, imagepth):
         else:
             return HttpResponseNotFound(json.dumps({"error": "image not found"}), content_type="application/json")
     else:
-        return HttpResponseNotAllowed(permitted_methods=["POST", "PUT", "DELETE", "PATCH"])
+        return HttpResponseNotAllowed(permitted_methods=["GET"])
     
 @csrf_exempt
 def url_validate(request):
@@ -74,7 +87,7 @@ def url_validate(request):
         except Exception as e:
             return HttpResponseBadRequest(content=json.dumps({"error": "something wrong with request body"}), content_type="application/json")
     else:
-        return HttpResponseNotAllowed(permitted_methods=["GET", "PUT", "DELETE", "PATCH"])
+        return HttpResponseNotAllowed(permitted_methods=["POST"])
     
 @csrf_exempt
 def metadata_text(request):
@@ -94,8 +107,53 @@ def metadata_text(request):
             'occurrences': ftext.lower().count(search.lower()),
         }), content_type="application/json")
     else:
-        return HttpResponseNotAllowed(permitted_methods=["GET", "PUT", "DELETE", "PATCH"])
+        return HttpResponseNotAllowed(permitted_methods=["POST"])
+
+def entity_list(request):
+    entities = read_entities()
+    return render(request, 'entity_list.html', {'entities': entities})
+
+def entity_detail(request, id):
+    entities = read_entities()
+    for entity in entities:
+        if entity['id'] == id:
+            return render(request, 'entity_detail.html', {'entity': entity})
     
+    return HttpResponseNotFound(content=json.dumps({"error": "entity not found"}), content_type="application/json")
+
+@csrf_exempt
+def create_entity(request):
+    """ send raw body from postman """
+    """ {"id":1,"name":"dummy2","img_link":"netflix_image.png"} - example """
+    if request.method == 'POST':
+        try:
+            dt = json.loads(request.body)
+            entities = read_entities()
+            entities.append(dt)
+            write_entities(entities)
+            return HttpResponse(content=json.dumps({"msg": "create success"}), content_type="application/json")
+        except Exception as e:
+            return HttpResponse(content=json.dumps({"msg": "error creating"}), status=500, content_type="application/json")
+    else:
+        return HttpResponseNotAllowed(permitted_methods=["POST"])
+
+@csrf_exempt
+def delete_entity(request, id):
+    """ /entity/<ID>/delete """
+    if request.method == 'DELETE':
+        try:
+            entities = read_entities()
+            entities = [e for e in entities if e.get('id') != int(id)]
+            write_entities(entities)
+            return HttpResponse(content=json.dumps({"msg": "delete success"}), content_type="application/json")
+        except Exception as e:
+            return HttpResponse(content=json.dumps({"msg": "error deleting"}), status=500, content_type="application/json")
+    else:
+        return HttpResponseNotAllowed(permitted_methods=["DELETE"])
+
+
 def info(request):
     return HttpResponse(content=json.dumps(
-        {"info": "file upload can be used via /metadata/, use form-data to attach file and search string to find\nurl validation can be accesed via /url_validate/ and body parameter 'url'\nand lastly image can be accessed through /image/"}), content_type="application/json")
+        {"info": "file upload can be used via /metadata/, use form-data to attach file and search string to find\n \
+         url validation can be accesed via /url_validate/ and body parameter 'url'\nand lastly image can be accessed through /image/\n \
+         /entity to list entities\n/entity/<ID> to check detailed entity\n/entity/create to create entity, pass it as raw body json object in post\n/entity/<ID>/delete to delete entity"}), content_type="application/json")

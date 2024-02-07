@@ -16,11 +16,16 @@ Including another URLconf
 """
 from django.urls import path
 from views import show_top_nbu_rates, show_image, url_validate, metadata_text, info
+from views import entity_list, entity_detail, create_entity, delete_entity
 
 urlpatterns = [
     path("nbu_rates/", show_top_nbu_rates, name="rates"),
     path("image/<str:imagepth>", show_image, name="image"),
     path("url_validate/", url_validate, name="url_validate"),
     path("metadata/", metadata_text, name="metadata_text"),
+    path('entity/', entity_list, name='entity_list'),
+    path('entity/<int:id>/', entity_detail, name='entity_detail'),
+    path('entity/create/', create_entity, name='create_entity'),
+    path('entity/<int:id>/delete/', delete_entity, name='delete_entity'),
     path("info/", info, name="info")
 ]

@@ -1,0 +1,7 @@
+[
+{
+"id": 1,
+"name": "dummy2",
+"img_link": "netflix_image.png"
+}
+]
