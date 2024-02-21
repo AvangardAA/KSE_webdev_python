@@ -214,6 +214,14 @@ def get_header_view(request, n):
 
 """ ------------ HW 7 END --------------- """
 
+""" ------------ HW 8 BEGIN --------------- """
+
+@csrf_exempt
+def chat(request):
+    return render(request, 'chat.html')
+
+""" ------------ HW 8 END --------------- """
+
 def info(request):
     return HttpResponse(content=json.dumps(
         {"info": "file upload can be used via /metadata/, use form-data to attach file and search string to find\n \

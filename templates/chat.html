@@ -1,0 +1,21 @@
+<body>
+    <div id="chat-kse"></div>
+    <input type="text" id="chat-in">
+    <button id="chat-send">send</button>
+
+    <script>
+        const sock = new WebSocket('ws://localhost:8000/ws/chat/');
+
+        sock.onmessage = function(e)
+        {
+            document.querySelector('#chat-kse').innerHTML += '<br>New message in chat: ' + JSON.parse(e.data).msg;
+        };
+
+        document.querySelector('#chat-send').onclick = function(e) 
+        {
+            const msgIn = document.querySelector('#chat-in');
+            sock.send(JSON.stringify({"msg": msgIn.value}));
+            msgIn.value = '';
+        };
+    </script>
+</body>

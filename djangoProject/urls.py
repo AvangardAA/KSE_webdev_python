@@ -18,6 +18,12 @@ from django.urls import path
 from views import show_top_nbu_rates, show_image, url_validate, metadata_text, info
 from views import entity_list, entity_detail, create_entity, delete_entity
 from views import get_header_view, get_cookie_view, set_cookie_view, set_header_view
+from views import chat
+from chat import consumer
+
+ws_urlpatterns = [
+    path('ws/chat/', consumer.ChatConsumer.as_asgi())
+]
 
 urlpatterns = [
     path("nbu_rates/", show_top_nbu_rates, name="rates"),
@@ -32,5 +38,6 @@ urlpatterns = [
     path('cookie/get/<str:n>', get_cookie_view, name='get_cookie'),
     path('header/set/', set_header_view, name='set_header'),
     path('header/get/<str:n>', get_header_view, name='get_header'),
-    path("info/", info, name="info")
+    path("info/", info, name="info"),
+    path('chat/', chat, name='chat')
 ]
