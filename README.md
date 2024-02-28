@@ -51,4 +51,5 @@ rootdir/webdev/python_logs.log - for Django
 ## Application usage:
 
 To begin with application, visit in your browser http://localhost:8000/
+
 This application is single-page, so everything user-oriented located here.
