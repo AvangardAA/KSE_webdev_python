@@ -1,4 +1,4 @@
-#h Project description
+# Project description
 
 My project topic is cryptocurrency data aggregator, for its implementation here Django and Nodejs are used.
 Django serves as a web-server which handles user interaction, database operations and channel with microservice.
