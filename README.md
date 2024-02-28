@@ -41,7 +41,7 @@ After that you will have ready to-go nodejs service, run it with:
 ```
 n use 16 index.js
 ```
-Important comment: execution showed above is recommended, because application requires node version 16+
+> Important comment: execution showed above is recommended, because application requires node version 16+
 
 Great, now you have a fully working application, log files are located in
 ```
