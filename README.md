@@ -44,10 +44,10 @@ n use 16 index.js
 Important comment: execution showed above is recommended, because application requires node version 16+
 
 Great, now you have a fully working application, log files are located in
-
+```
 rootdir/webdev/webdev/nodejs/logs/ws_service.log - for Nodejs
 rootdir/webdev/python_logs.log - for Django
-
+```
 ## Application usage:
 
 To begin with application, visit in your browser http://localhost:8000/
