@@ -9,7 +9,7 @@ Nodejs here is used to implement standalone microservice functionality, it recei
 As my PC is Linux-based (Ubuntu), there is a path to correctly install this app.
 ```
 sudo apt install npm
-sudo apt install -g n
+sudo npm install -g n
 sudo n 16
 ```
 Listed requirements are for node, then you must have Python version 3.10+.
